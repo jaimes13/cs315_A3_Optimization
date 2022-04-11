@@ -58,10 +58,7 @@ Particle* Fluid::particle_at(std::size_t index)
 	if (index > particles.size())
 		throw "out of bounds";
 	
-	auto it = particles.begin();
-	for (; index != 0; it++, index--);
-
-	return *it;
+	return particles[index];
 }
 
 // Fill a region in the lower left with evenly spaced particles

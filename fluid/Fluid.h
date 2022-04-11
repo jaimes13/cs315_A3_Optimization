@@ -4,6 +4,7 @@
 #pragma warning(push, 0)
 #include <d3dx9math.h>
 #pragma warning(pop)
+#include <vector>
 #include <list>
 
 
@@ -57,7 +58,7 @@ class Fluid
 
 		/* Common Data */
 		unsigned int * gridindices;
-		std::list<Particle*> particles;
+		std::vector<Particle*> particles;
 
 		FluidGridOffset * gridoffsets;
 		unsigned int neighbors_capacity;
