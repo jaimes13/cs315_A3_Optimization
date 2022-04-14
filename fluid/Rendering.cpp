@@ -209,11 +209,11 @@ void RenderFluid( IDirect3DDevice9* pd3dDevice )
     // Render each particle
     for ( unsigned int i = 0 ; i < FLUID->Size() ; i++ ) 
 	{
-        float screen_x = FLUID->particle_at(i)->pos.x * screen_scale_x;
-        float screen_y = FLUID->particle_at(i)->pos.y * screen_scale_y;
+        float screen_x = FLUID->particles[i]->pos.x * screen_scale_x;
+        float screen_y = FLUID->particles[i]->pos.y * screen_scale_y;
         D3DXVECTOR3 position( screen_x, screen_y, 0 );
         D3DXVECTOR3 center( PARTICLE_SIZE / 2, PARTICLE_SIZE / 2, 0 );
-        unsigned int color = (unsigned int)(128 * FLUID->particle_at(i)->density / FluidRestDensity);
+        unsigned int color = (unsigned int)(128 * FLUID->particles[i]->density / FluidRestDensity);
         color = (color > 255)? 255 : color;
         g_pSprite->Draw( g_pTexture, NULL, &center, &position, D3DCOLOR_ARGB( 255, 255 - color, 255 - color, 255 ) );
     }

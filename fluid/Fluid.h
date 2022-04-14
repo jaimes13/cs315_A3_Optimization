@@ -4,7 +4,7 @@
 #pragma warning(push, 0)
 #include <d3dx9math.h>
 #pragma warning(pop)
-#include <list>
+#include <vector>
 
 
 // Fluid magic numbers
@@ -57,7 +57,7 @@ class Fluid
 
 		/* Common Data */
 		unsigned int * gridindices;
-		std::list<Particle*> particles;
+		std::vector<Particle*> particles;
 
 		FluidGridOffset * gridoffsets;
 		unsigned int neighbors_capacity;
@@ -70,7 +70,6 @@ class Fluid
 		void PauseOnStep( unsigned int p )	{ pause_step = p; }
 		double Width()						{ return width; }
 		double Height()						{ return height; }
-		Particle* particle_at(std::size_t index);
 
 	private:
 		
