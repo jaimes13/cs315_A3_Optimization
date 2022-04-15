@@ -42,7 +42,7 @@ Fluid::~Fluid()
 
 // Create the fluid simulation
 // width/height is the simulation world maximum size
-void Fluid::Create(double w, double h) 
+void Fluid::Create(float w, float h) 
 {
 	width = w;
 	height = h;
@@ -54,7 +54,7 @@ void Fluid::Create(double w, double h)
 }
 
 // Fill a region in the lower left with evenly spaced particles
-void Fluid::Fill(double size) 
+void Fluid::Fill(float size) 
 {
 	Clear();
 
@@ -155,7 +155,7 @@ void Fluid::UpdateGrid()
 void Fluid::GetNeighbors() 
 {
 	// Search radius is the smoothing length
-	double h2 = FluidSmoothLen*FluidSmoothLen;
+	float h2 = FluidSmoothLen*FluidSmoothLen;
 
 	num_neighbors = 0;
 	
@@ -187,7 +187,7 @@ void Fluid::GetNeighbors()
 					{
 						// Distance squared
 						D3DXVECTOR2 d = pos_P - particles[N]->pos;
-						double distsq = d.x * d.x + d.y * d.y;
+						float distsq = d.x * d.x + d.y * d.y;
 
 						// Check that the particle is within the smoothing length
 						if (distsq < h2) 
@@ -225,18 +225,18 @@ void Fluid::ComputeDensity()
 	for( unsigned int i = 0; i < num_neighbors ; i++ ) 
 	{		
 		// distance squared
-		double r2 = neighbors[i].distsq;
+		float r2 = neighbors[i].distsq;
 		
 		// Density is based on proximity and mass
 		// Density is:
 		// M_n * W(h, r)
 		// Where the smoothing kernel is:
 		// The the "Poly6" kernel
-		double h2_r2 = FluidSmoothLen * FluidSmoothLen - r2;
-		double dens = h2_r2*h2_r2*h2_r2;
+		float h2_r2 = FluidSmoothLen * FluidSmoothLen - r2;
+		float dens = h2_r2*h2_r2*h2_r2;
 
-		double P_mass = FluidWaterMass;
-		double N_mass = FluidWaterMass;
+		float P_mass = FluidWaterMass;
+		float N_mass = FluidWaterMass;
 		 
 		particles[neighbors[i].p]->density += N_mass * dens;
 		particles[neighbors[i].n]->density += P_mass * dens;
@@ -270,7 +270,7 @@ void Fluid::ComputeForce()
 	for( unsigned int i = 0; i < num_neighbors; i++ ) 
 	{				
 		// Compute force due to pressure and viscosity
-		double h_r = FluidSmoothLen - neighbors[i].distsq;
+		float h_r = FluidSmoothLen - neighbors[i].distsq;
 		D3DXVECTOR2 diff = particles[neighbors[i].n]->pos - particles[neighbors[i].p]->pos;
 
 		// Forces is dependant upon the average pressure and the inverse distance
@@ -298,7 +298,7 @@ void Fluid::ComputeForce()
 
 // Simulation Update
 // Integration
-void Fluid::Integrate( double dt ) 
+void Fluid::Integrate( float dt ) 
 {
 	// Walls
 	std::vector<D3DXVECTOR3> planes;
@@ -313,7 +313,7 @@ void Fluid::Integrate( double dt )
 		// Walls
 		for( auto it = planes.begin(); it != planes.end(); it++ )
 		{
-			double dist = particles[particle]->pos.x * (*it).x + particles[particle]->pos.y * (*it).y + (*it).z;
+			float dist = particles[particle]->pos.x * (*it).x + particles[particle]->pos.y * (*it).y + (*it).z;
 			particles[particle]->acc += min(dist, 0) * -FluidStaticStiff * D3DXVECTOR2( (*it).x, (*it).y );
 		}
 
@@ -328,7 +328,7 @@ void Fluid::Integrate( double dt )
 }
 
 // Simulation Update
-void Fluid::Update( double dt ) 
+void Fluid::Update( float dt ) 
 {
 	// Pause runs the simulation standing still for profiling
 	if( paused || step == pause_step ) { dt = 0.0f; }
