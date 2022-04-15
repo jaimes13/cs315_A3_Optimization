@@ -64,8 +64,8 @@
       <AdditionalIncludeDirectories>.\DXUT\Core;.\DXUT\Optional;$(DXSDK_DIR)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <StructMemberAlignment>2Bytes</StructMemberAlignment>
@@ -77,6 +77,9 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <DebugInformationFormat>None</DebugInformationFormat>
       <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -92,11 +95,11 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>.\DXUT\Core;.\DXUT\Optional;$(DXSDK_DIR)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsManaged>false</CompileAsManaged>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <StructMemberAlignment>2Bytes</StructMemberAlignment>
@@ -107,6 +110,9 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <DebugInformationFormat>None</DebugInformationFormat>
       <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
