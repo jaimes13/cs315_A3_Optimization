@@ -103,7 +103,7 @@ void Fluid::Clear()
 __forceinline void Fluid::ExpandNeighbors() 
 {
 	// Increase the size of the neighbors array because it is full
-	neighbors_capacity += 20;
+	neighbors_capacity *= 2;
 	FluidNeighborRecord* new_neighbors = new FluidNeighborRecord[ neighbors_capacity ];
 	memcpy( new_neighbors, neighbors, sizeof(FluidNeighborRecord) * num_neighbors );
 	delete[] neighbors;
