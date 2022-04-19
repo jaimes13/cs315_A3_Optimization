@@ -98,4 +98,5 @@ class Fluid
 		float poly6_coef;
 		float grad_spiky_coef;
 		float lap_vis_coef;
+		std::vector<D3DXVECTOR3> planes;
 };

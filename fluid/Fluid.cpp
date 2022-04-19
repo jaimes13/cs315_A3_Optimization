@@ -51,6 +51,11 @@ void Fluid::Create(float w, float h)
 
 	delete[] gridoffsets;
 	gridoffsets = new FluidGridOffset[ grid_w * grid_h ];
+
+	planes.push_back(D3DXVECTOR3(1, 0, 0));
+	planes.push_back(D3DXVECTOR3(0, 1, 0));
+	planes.push_back(D3DXVECTOR3(-1, 0, width));
+	planes.push_back(D3DXVECTOR3(0, -1, height));
 }
 
 // Fill a region in the lower left with evenly spaced particles
@@ -301,20 +306,15 @@ void Fluid::ComputeForce()
 void Fluid::Integrate( float dt ) 
 {
 	// Walls
-	std::vector<D3DXVECTOR3> planes;
-	planes.push_back( D3DXVECTOR3(1, 0, 0) );
-	planes.push_back( D3DXVECTOR3(0, 1, 0) );
-	planes.push_back( D3DXVECTOR3(-1, 0, width) );
-	planes.push_back( D3DXVECTOR3(0, -1, height) );
-
 	D3DXVECTOR2 gravity = D3DXVECTOR2(0, 1);
 	for( unsigned int particle = 0 ; particle < particles.size() ; ++particle ) 
 	{
 		// Walls
-		for( auto it = planes.begin(); it != planes.end(); it++ )
+		size_t size = planes.size();
+		for(unsigned int it = 0; it < size; it++)
 		{
-			float dist = particles[particle]->pos.x * (*it).x + particles[particle]->pos.y * (*it).y + (*it).z;
-			particles[particle]->acc += min(dist, 0) * -FluidStaticStiff * D3DXVECTOR2( (*it).x, (*it).y );
+			float dist = particles[particle]->pos.x * planes[it].x + particles[particle]->pos.y * planes[it].y + planes[it].z;
+			particles[particle]->acc += min(dist, 0) * -FluidStaticStiff * D3DXVECTOR2(planes[it].x, planes[it].y );
 		}
 
 		// Acceleration
