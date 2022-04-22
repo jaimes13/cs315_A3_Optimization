@@ -116,22 +116,58 @@ void Fluid::UpdateGrid()
 	// Cell size is the smoothing length
 
 	// Clear the offsets
-	float cell_count = grid_w * grid_h;
-	for( int offset = 0; offset < cell_count; offset++ ) 
+	float cell_count = grid_w * grid_h; 
+	int offset = 0;
+	for(; offset < cell_count-7; ) 
 	{
-		gridoffsets[offset].count = 0;
+		gridoffsets[offset++].count = 0;
+		gridoffsets[offset++].count = 0;
+		gridoffsets[offset++].count = 0;
+		gridoffsets[offset++].count = 0;
+		gridoffsets[offset++].count = 0;
+		gridoffsets[offset++].count = 0;
+		gridoffsets[offset++].count = 0;
+		gridoffsets[offset++].count = 0;
+	}
+	for (; offset < cell_count; )
+	{
+		gridoffsets[offset++].count = 0;
 	}
 
 	// Count the number of particles in each cell
-	for( unsigned int particle = 0; particle < particles.size(); particle++ ) 
+	int p_gx[4], p_gy[4], cell[4];
+	unsigned int particle = 0;
+	for( ; particle < particles.size()-3; particle+=4 ) 
 	{
 		// Find where this particle is in the grid
-		int p_gx = min(max((int)(particles[particle]->pos.x / FluidSmoothLen), 0), grid_w - 1);
-		int p_gy = min(max((int)(particles[particle]->pos.y / FluidSmoothLen), 0), grid_h - 1);
-		int cell = p_gy * grid_w + p_gx ;
-		gridoffsets[ cell ].count++;
-	}
+		p_gx[0] = min(max((int)(particles[particle]->pos.x / FluidSmoothLen), 0), grid_w - 1);
+		p_gx[1] = min(max((int)(particles[particle+1]->pos.x / FluidSmoothLen), 0), grid_w - 1);
+		p_gx[2] = min(max((int)(particles[particle+2]->pos.x / FluidSmoothLen), 0), grid_w - 1);
+		p_gx[3] = min(max((int)(particles[particle+3]->pos.x / FluidSmoothLen), 0), grid_w - 1);
 
+		p_gy[0] = min(max((int)(particles[particle]->pos.y / FluidSmoothLen), 0), grid_h - 1);
+		p_gy[1] = min(max((int)(particles[particle + 1]->pos.y / FluidSmoothLen), 0), grid_h - 1);
+		p_gy[2] = min(max((int)(particles[particle + 2]->pos.y / FluidSmoothLen), 0), grid_h - 1);
+		p_gy[3] = min(max((int)(particles[particle + 3]->pos.y / FluidSmoothLen), 0), grid_h - 1);
+
+		cell[0] = p_gy[0] * grid_w + p_gx[0];
+		cell[1] = p_gy[1] * grid_w + p_gx[1];
+		cell[2] = p_gy[2] * grid_w + p_gx[2];
+		cell[3] = p_gy[3] * grid_w + p_gx[3];
+
+		gridoffsets[cell[0]].count++;
+		gridoffsets[cell[1]].count++;
+		gridoffsets[cell[2]].count++;
+		gridoffsets[cell[3]].count++;
+	}
+	for (; particle < particles.size(); particle++)
+	{
+		// Find where this particle is in the grid
+		int p_gxt = min(max((int)(particles[particle]->pos.x / FluidSmoothLen), 0), grid_w - 1);
+		int p_gyt = min(max((int)(particles[particle]->pos.y / FluidSmoothLen), 0), grid_h - 1);
+		int cellt = p_gyt * grid_w + p_gxt;
+		gridoffsets[cellt].count++;
+	}
 	// Prefix sum all of the cells
 	unsigned int sum = 0;
 	for( int offset = 0; offset < (grid_w * grid_h); offset++ ) 
@@ -215,6 +251,8 @@ void Fluid::GetNeighbors()
 				}
 			}
 		}
+
+		particles[P]->density = 0;
 	}
 }
 
@@ -224,11 +262,11 @@ void Fluid::ComputeDensity()
 {
 	float constant = (FluidSmoothLen * FluidSmoothLen) * (FluidSmoothLen * FluidSmoothLen) * (FluidSmoothLen * FluidSmoothLen) * FluidWaterMass;
 
-	for( unsigned int particle = 0; particle < particles.size(); particle++ )
-	{
-		// This is r = 0
-		particles[particle]->density = constant;
-	}
+	//for( unsigned int particle = 0; particle < particles.size(); particle++ )
+	//{
+	//	// This is r = 0
+	//	particles[particle]->density = constant;
+	//}
 
 	// foreach neighboring pair of particles
 	for( unsigned int i = 0; i < num_neighbors ; i++ ) 
@@ -254,6 +292,7 @@ void Fluid::ComputeDensity()
 	// based on a spring eqation relating the rest density
 	for( unsigned int particle = 0 ; particle < particles.size(); ++particle )
 	{
+		particles[particle]->density += constant;
 		particles[particle]->density *= poly6_coef;
 		particles[particle]->pressure = FluidStiff * max(pow(particles[particle]->density / FluidRestDensity, 3) - 1, 0);
 	}
@@ -263,7 +302,19 @@ void Fluid::ComputeDensity()
 // Perform a batch of sqrts to turn distance squared into distance
 void Fluid::SqrtDist() 
 {
-	for( unsigned int i = 0; i < num_neighbors; i++ ) 
+	unsigned int i = 0;
+	for(; i < num_neighbors-7; i+=8 ) 
+	{
+		neighbors[i].distsq = sqrt(neighbors[i].distsq);
+		neighbors[i + 1].distsq = sqrt(neighbors[i + 1].distsq);
+		neighbors[i + 2].distsq = sqrt(neighbors[i + 2].distsq);
+		neighbors[i + 3].distsq = sqrt(neighbors[i + 3].distsq);
+		neighbors[i + 4].distsq = sqrt(neighbors[i + 4].distsq);
+		neighbors[i + 5].distsq = sqrt(neighbors[i + 5].distsq);
+		neighbors[i + 6].distsq = sqrt(neighbors[i + 6].distsq);
+		neighbors[i + 7].distsq = sqrt(neighbors[i + 7].distsq);
+	}
+	for (; i < num_neighbors; i++)
 	{
 		neighbors[i].distsq = sqrt(neighbors[i].distsq);
 	}
