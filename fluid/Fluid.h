@@ -56,8 +56,9 @@ class Fluid
 		void Update(float dt);
 
 		/* Common Data */
-		unsigned int * gridindices;
 		std::vector<Particle*> particles;
+		std::vector<Particle*> reconstruction_particles;
+
 
 		FluidGridOffset * gridoffsets;
 		unsigned int neighbors_capacity;

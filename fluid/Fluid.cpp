@@ -13,7 +13,6 @@ Fluid::Fluid()
 	grid_w = 0;
 	grid_h = 0;
 
-	gridindices = NULL;
 	gridoffsets = NULL;
 	num_neighbors = 0;
 	// If this value is too small, ExpandNeighbors will fix it
@@ -66,11 +65,11 @@ void Fluid::Fill(float size)
 	int w = (int)(size / FluidInitialSpacing);
 
 	// Allocate
-	gridindices = new unsigned int[ w * w ];
 	for (int i = 0; i < w*w; i++)
 	{
 		Particle* p = new Particle;
 		particles.push_back(p);
+		reconstruction_particles.push_back(nullptr);
 	}
 
 	// Populate
@@ -81,7 +80,6 @@ void Fluid::Fill(float size)
 			particles[y*w + x]->pos = D3DXVECTOR2(x * FluidInitialSpacing, Height() - y * FluidInitialSpacing);
 			particles[y*w + x]->vel = D3DXVECTOR2(0, 0);
 			particles[y*w + x]->acc = D3DXVECTOR2(0, 0);
-			gridindices[ y*w+x ] = 0;
 		}
 	}
 }
@@ -94,8 +92,7 @@ void Fluid::Clear()
 	for (auto p : particles)
 		delete p;
 	particles.clear();
-
-	delete[] gridindices; gridindices = NULL;
+	reconstruction_particles.clear();
 }
 
 // Expand the Neighbors list if necessary
@@ -150,9 +147,10 @@ void Fluid::UpdateGrid()
 		int p_gx = min(max((int)(particles[particle]->pos.x * (1.0 / FluidSmoothLen)), 0), grid_w - 1);
 		int p_gy = min(max((int)(particles[particle]->pos.y * (1.0 / FluidSmoothLen)), 0), grid_h - 1);
 		int cell = p_gy * grid_w + p_gx ;
-		gridindices[ gridoffsets[ cell ].offset + gridoffsets[ cell ].count ] = particle;
+		reconstruction_particles[ gridoffsets[ cell ].offset + gridoffsets[ cell ].count ] = particles[particle];
 		gridoffsets[ cell ].count++;
 	}
+	particles = reconstruction_particles;
 }
 
 // Simulation Update
@@ -173,20 +171,20 @@ void Fluid::GetNeighbors()
 		D3DXVECTOR2 pos_P = particles[P]->pos;
 
 		// For every adjacent grid cell (9 cells total for 2D)
-		for (int d_gy = ((p_gy<1)?0:-1); d_gy <= ((p_gy<grid_h-1)?1:0); d_gy++) 
+		for (int d_gx = ((p_gx<1)?0:-1); d_gx <= ((p_gx<grid_w-1)?1:0); d_gx++) 
 		{
-			for (int d_gx = ((p_gx<1)?0:-1); d_gx <= ((p_gx<grid_w-1)?1:0); d_gx++) 
+			for (int d_gy = ((p_gy<1)?0:-1); d_gy <= ((p_gy<grid_h-1)?1:0); d_gy++) 
 			{
 				// Neighboring cell
 				int n_cell = cell + d_gy * grid_w + d_gx; 
 
 				// Loop over ever particle in the neighboring cell
-				unsigned int* start = gridindices + gridoffsets[n_cell].offset;
-				unsigned int* end = start + gridoffsets[n_cell].count;
+				unsigned int start = gridoffsets[n_cell].offset;
+				unsigned int count = gridoffsets[n_cell].count;
 
-				for ( ; start != end ; ++start) 
+				for (int i = 0; i < count; i++)
 				{
-					unsigned int N = *start;
+					unsigned int N = start + i;
 					// Only record particle "pairs" once
 					if (P > N) 
 					{
